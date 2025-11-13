@@ -1,4 +1,42 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import { RecipesService } from './recipes.service';
+import { CreateRecipeDto, UpdateRecipeDto } from 'src/validators/recipes.validator';
+import { Recipe } from './recipes.entity';
 
 @Controller('recipes')
-export class RecipesController {}
+export class RecipesController {
+  constructor(private readonly recipesService: RecipesService) {}
+
+  // ✅ Create
+  @Post()
+  create(@Body() dto: CreateRecipeDto): Promise<Recipe> {
+    return this.recipesService.create(dto);
+  }
+
+  // ✅ Get all
+  @Get()
+  findAll(): Promise<Recipe[]> {
+    return this.recipesService.findAll();
+  }
+
+  // ✅ Get one
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Recipe> {
+    return this.recipesService.findOne(id);
+  }
+
+  // ✅ Update
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateRecipeDto,
+  ): Promise<Recipe> {
+    return this.recipesService.update(id, dto);
+  }
+
+  // ✅ Delete
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.recipesService.remove(id);
+  }
+}

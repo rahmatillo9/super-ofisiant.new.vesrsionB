@@ -16,7 +16,7 @@ export class OrdersService {
     private orderRepo: Repository<Order>,
 
     @InjectRepository(OrderItem) // 🟢 qo‘shdik
-    private orderItemRepo: Repository<OrderItem>,
+    // private orderItemRepo: Repository<OrderItem>,
 
     private readonly ordersGateway: OrdersGateway,
   ) {}
