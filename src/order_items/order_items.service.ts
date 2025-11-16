@@ -111,6 +111,7 @@ private readonly dataSource: DataSource,
     .addSelect('COALESCE(SUM(item.quantity), 0)', 'total_sold')
     .addSelect('COALESCE(SUM(item.quantity), 0) * product.price', 'total_revenue')
     .groupBy('product.id')
+    .where('product.isIngredient = false') 
     .addGroupBy('product.name')
     .orderBy('total_sold', 'DESC')
     .getRawMany();

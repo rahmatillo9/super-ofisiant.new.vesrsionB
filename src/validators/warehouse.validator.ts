@@ -16,10 +16,7 @@ export class CreateWarehouseDto {
   @IsOptional()
   totalSpent?: number = 0; // Mahsulotga sarflangan jami summa
 
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  totalEarned?: number = 0; // Mahsulotdan olingan jami daromad
+
 }
 
 
@@ -39,8 +36,5 @@ export class UpdateWarehouseDto {
   @Min(0)
   totalSpent?: number;
 
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  totalEarned?: number;
+
 }

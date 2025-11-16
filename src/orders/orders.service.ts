@@ -7,7 +7,9 @@ import { CreateOrderDto } from 'src/validators/orders.validator';
 import { UpdateOrderDto } from 'src/validators/orders.validator';
 import { OrderStatus } from './orders.enum';
 import { OrdersGateway } from './orders.gateway';
-import { OrderItem } from 'src/order_items/order_items.entity';
+// import { OrderItem } from 'src/order_items/order_items.entity';
+import { Warehouse } from 'src/warehouse/warehouse.entity';
+import { Recipe } from 'src/recipes/recipes.entity';
 
 @Injectable()
 export class OrdersService {
@@ -15,10 +17,16 @@ export class OrdersService {
     @InjectRepository(Order)
     private orderRepo: Repository<Order>,
 
-    @InjectRepository(OrderItem) // 🟢 qo‘shdik
+    @InjectRepository(Warehouse)
+    private warehouseRepo: Repository<Warehouse>,
+
+    @InjectRepository(Recipe)
+    private recipeRepo: Repository<Recipe>,
+
+    // @InjectRepository(OrderItem) // 🟢 qo‘shdik
     // private orderItemRepo: Repository<OrderItem>,
 
-    private readonly ordersGateway: OrdersGateway,
+    private readonly ordersGateway: OrdersGateway, 
   ) {}
 
   async create(dto: CreateOrderDto): Promise<Order> {
@@ -30,6 +38,8 @@ export class OrdersService {
 
     return savedOrder;
   }
+
+  
 
 
 
@@ -69,18 +79,68 @@ export class OrdersService {
     });
   }
 
-  async updateStatus(orderId: number, status: OrderStatus): Promise<Order> {
-    const order = await this.findOne(orderId);
-    order.status = status;
-    const savedOrder = await this.orderRepo.save(order);
 
-    if (status === OrderStatus.PAID) {
-      // 🖨️ agar to‘langan bo‘lsa, printerga yuboramiz
-      this.ordersGateway.sendOrderToPrint(savedOrder);
+private async decreaseStockByRecipe(order: Order) {
+  for (const item of order.items) {
+    const parentProductId = item.productId;
+
+    const recipes = await this.recipeRepo.find({
+      where: { parentProductId },
+      relations: ['ingredient'],
+    });
+
+    if (!recipes.length) continue;
+
+    for (const recipe of recipes) {
+      const ingredientId = recipe.ingredientId;
+
+      // Ombordan ingredientni topamiz yoki yangi yaratiladi
+      let warehouse = await this.warehouseRepo.findOne({
+        where: { productId: ingredientId },
+      });
+
+      if (!warehouse) {
+        warehouse = this.warehouseRepo.create({
+          productId: ingredientId,
+          quantity: 0, // boshlang‘ich miqdor
+          totalSpent: 0,
+        });
+        await this.warehouseRepo.save(warehouse);
+      }
+
+      const totalUsed = recipe.quantity * item.quantity;
+
+      // Agar yetarli zaxira bo‘lmasa, miqdorni 0 ga tushiramiz
+      warehouse.quantity = Math.max(warehouse.quantity - totalUsed, 0);
+
+      await this.warehouseRepo.save(warehouse);
     }
-
-    return savedOrder;
   }
+}
+
+
+
+
+
+
+  
+async updateStatus(orderId: number, status: OrderStatus): Promise<Order> {
+  const order = await this.findOne(orderId);
+  order.status = status;
+  const savedOrder = await this.orderRepo.save(order);
+
+  if (status === OrderStatus.PAID) {
+    // 🟢 STOK AYRILADI
+    await this.decreaseStockByRecipe(savedOrder);
+
+    // 🖨️ Order printerga yuboriladi
+    this.ordersGateway.sendOrderToPrint(savedOrder);
+  }
+
+  return savedOrder;
+}
+
+
   
 
   async findOne(id: number): Promise<Order> {

@@ -11,7 +11,7 @@ import { Category } from 'src/categories/catefories.entity';
 import { OrderItem } from 'src/order_items/order_items.entity';
 
 export enum UnitType {
-  PIECE = 'piece',
+  PIECE = 'ta',
   KG = 'kg',
   GR = 'gr',
   LITER = 'liter',
@@ -31,7 +31,7 @@ export class Product {
   @Column()
   categoryId: number;
 
-   @Column()
+   @Column( {nullable: true})
   image_url: string;
 
   @Column({
@@ -40,6 +40,9 @@ export class Product {
     default: UnitType.PIECE,
   })
   unitType: UnitType;
+
+  @Column({ default: false })
+isIngredient: boolean;
 
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'categoryId' })

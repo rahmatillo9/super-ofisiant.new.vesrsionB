@@ -8,11 +8,13 @@ import { Table } from 'src/tables/tabels.entity';
 import { OrderItem } from 'src/order_items/order_items.entity';
 import { OrderItemsModule } from 'src/order_items/order_items.module';
 import { OrdersGateway } from './orders.gateway';
+import { Warehouse } from 'src/warehouse/warehouse.entity';
+import { Recipe } from 'src/recipes/recipes.entity';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, User, Table, OrderItem]),
+    TypeOrmModule.forFeature([Order, User, Table, OrderItem, Warehouse, Recipe]),
     OrderItemsModule
   ],
   providers: [OrdersService, OrdersGateway],

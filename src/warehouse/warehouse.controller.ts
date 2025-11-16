@@ -19,10 +19,21 @@ export class WarehouseController {
     return this.warehouseService.findAll();
   }
 
+  
+
   // ✅ Get one
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Warehouse> {
     return this.warehouseService.findOne(id);
+  }
+
+    @Post('add-stock')
+  async addStock(
+    @Body('productId', ParseIntPipe) productId: number,
+    @Body('addedQty') addedQty: number,
+    @Body('totalPrice') totalPrice: number,
+  ) {
+    return this.warehouseService.addStock(productId, addedQty, totalPrice);
   }
 
   // ✅ Update

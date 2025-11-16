@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -29,6 +30,10 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   image_url?: string;
+
+  @IsBoolean()
+  @IsOptional() // default: true bo‘lishi mumkin
+  isIngredient?: boolean;
 }
 
 export class UpdateProductDto {
@@ -54,4 +59,8 @@ export class UpdateProductDto {
     @IsString()
     @IsOptional()
     image_url?: string;
+
+    @IsBoolean()
+  @IsOptional() // default: true bo‘lishi mumkin
+  isIngredient?: boolean;
 }

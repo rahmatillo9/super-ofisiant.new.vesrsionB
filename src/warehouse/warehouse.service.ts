@@ -22,6 +22,24 @@ export class WarehouseService {
     return this.warehouseRepository.find({ relations: ['product'] });
   }
 
+async addStock(productId: number, addedQty: number, totalPrice: number) {
+  let warehouse = await this.warehouseRepository.findOne({ where: { productId } });
+
+  if (!warehouse) {
+    warehouse = this.warehouseRepository.create({
+      productId,
+      quantity: addedQty,
+      totalSpent: totalPrice,
+    });
+  } else {
+    warehouse.quantity += addedQty;
+    warehouse.totalSpent += totalPrice;
+  }
+
+  return this.warehouseRepository.save(warehouse);
+}
+
+
   // ✅ Get one
   async findOne(id: number): Promise<Warehouse> {
     const warehouse = await this.warehouseRepository.findOne({

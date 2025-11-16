@@ -26,6 +26,5 @@ export class Warehouse {
   @Column({ type: 'float', default: 0 })
   totalSpent: number; // Mahsulotga sarflangan jami summa (rashod)
 
-  @Column({ type: 'float', default: 0 })
-  totalEarned: number; // Ushbu mahsulotdan olingan jami daromad (foyda uchun)
+
 }
